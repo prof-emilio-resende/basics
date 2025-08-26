@@ -9,19 +9,32 @@ function Pessoa(altura, peso) {
 
 function Nutricionista(altura, peso) {
     Pessoa.call(this, altura, peso);
-    this.imc = function () {
-        return this.peso / (this.altura * this.altura);
+    this.imcVal = 0;
+    this.imcLabel = "";
+    this.imc = function (callback) {
+        var self = this;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:3000/imc/calculate", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var resp = JSON.parse(xhr.responseText);
+                self.imcVal = resp.imc;
+                self.imcLabel = resp.imcDescription;
+                callback(resp.imc, resp.imcDescription);
+            }
+        };
+        xhr.send(JSON.stringify({ height: this.altura, weight: this.peso }));
     };
 
     this.classificaIMC = function () {
-        var imc = this.imc();
-        if (imc < 18.5) {
+        if (this.imcVal < 18.5) {
             return "Abaixo do peso";
         }
-        if (imc >= 18.5 && imc < 24.9) {
+        if (this.imcVal >= 18.5 && this.imcVal < 24.9) {
             return "Peso normal";
         }
-        if (imc >= 25 && imc < 29.9) {
+        if (this.imcVal >= 25 && this.imcVal < 29.9) {
             return "Sobrepeso";
         }
 
@@ -32,9 +45,10 @@ Nutricionista.prototype = Object.create(Pessoa.prototype);
 Nutricionista.prototype.constructor = Nutricionista;
 
 function renderizaResultadoIMC(nutricionista) {
-    document.getElementById("imc").innerText =
-        nutricionista.imc().toFixed(2) + " - " + nutricionista.classificaIMC();
-    renderizaTabelaIMC(nutricionista.imc());
+    nutricionista.imc(function(imc, imcDescription) {
+        document.getElementById("imc").innerText = imc.toFixed(2) + " - " + imcDescription;
+        renderizaTabelaIMC(nutricionista.imcVal);
+    });
 }
 
 function renderizaTabelaIMC(valorIMC) {
