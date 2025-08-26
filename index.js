@@ -13,18 +13,22 @@ function Nutricionista(altura, peso) {
     this.imcLabel = "";
     this.imc = function (callback) {
         var self = this;
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:3000/imc/calculate", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var resp = JSON.parse(xhr.responseText);
-                self.imcVal = resp.imc;
-                self.imcLabel = resp.imcDescription;
-                callback(resp.imc, resp.imcDescription);
-            }
-        };
-        xhr.send(JSON.stringify({ height: this.altura, weight: this.peso }));
+        fetch("http://localhost:3000/imc/calculate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ height: this.altura, weight: this.peso })
+        })
+        .then(function(response) {
+            if (!response.ok) throw new Error("Erro ao calcular IMC");
+            return response.json();
+        })
+        .then(function(resp) {
+            self.imcVal = resp.imc;
+            self.imcLabel = resp.imcDescription;
+            callback(resp.imc, resp.imcDescription);
+        });
     };
 
     this.classificaIMC = function () {
