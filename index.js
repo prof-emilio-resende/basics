@@ -11,9 +11,9 @@ function Nutricionista(altura, peso) {
     Pessoa.call(this, altura, peso);
     this.imcVal = 0;
     this.imcLabel = "";
-    this.imc = function (callback) {
+    this.imc = function () {
         var self = this;
-        fetch("http://localhost:3000/imc/calculate", {
+        return fetch("http://localhost:3000/imc/calculate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -27,7 +27,7 @@ function Nutricionista(altura, peso) {
         .then(function(resp) {
             self.imcVal = resp.imc;
             self.imcLabel = resp.imcDescription;
-            callback(resp.imc, resp.imcDescription);
+            return resp;
         });
     };
 
@@ -49,8 +49,8 @@ Nutricionista.prototype = Object.create(Pessoa.prototype);
 Nutricionista.prototype.constructor = Nutricionista;
 
 function renderizaResultadoIMC(nutricionista) {
-    nutricionista.imc(function(imc, imcDescription) {
-        document.getElementById("imc").innerText = imc.toFixed(2) + " - " + imcDescription;
+    nutricionista.imc().then(function(resp) {
+        document.getElementById("imc").innerText = resp.imc.toFixed(2) + " - " + resp.imcDescription;
         renderizaTabelaIMC(nutricionista.imcVal);
     });
 }
