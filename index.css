@@ -1,3 +1,18 @@
+/* Destaca a linha da tabela de IMC relacionada ao valor calculado */
+.destaque-imc {
+  background-color: #ffe066;
+  font-weight: bold;
+}
+
+#tabela-imc {
+  margin-top: 1em;
+  border: 1px solid #888;
+}
+#tabela-imc th, #tabela-imc td {
+  border: 1px solid #888;
+  padding: 0.5em 1em;
+  text-align: center;
+}
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (max-width: 768px) {
   .container {

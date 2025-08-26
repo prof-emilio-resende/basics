@@ -34,6 +34,29 @@ Nutricionista.prototype.constructor = Nutricionista;
 function renderizaResultadoIMC(nutricionista) {
     document.getElementById("imc").innerText =
         nutricionista.imc().toFixed(2) + " - " + nutricionista.classificaIMC();
+    renderizaTabelaIMC(nutricionista.imc());
+}
+
+function renderizaTabelaIMC(valorIMC) {
+    var intervalos = [
+        { min: 0, max: 18.5, texto: "Abaixo do peso" },
+        { min: 18.5, max: 24.9, texto: "Peso normal" },
+        { min: 25, max: 29.9, texto: "Sobrepeso" },
+        { min: 29.9, max: Infinity, texto: "Obesidade" }
+    ];
+    var html = '<table id="tabela-imc" style="width:100%;border-collapse:collapse;">';
+    html += '<tr><th>Intervalo IMC</th><th>Classificação</th></tr>';
+    for (var i = 0; i < intervalos.length; i++) {
+        var intervalo = intervalos[i];
+        var destaque = (valorIMC >= intervalo.min && valorIMC < intervalo.max) ? 'class="destaque-imc"' : '';
+        var maxTexto = intervalo.max === Infinity ? "ou mais" : intervalo.max;
+        html += '<tr ' + destaque + '>' +
+            '<td>' + intervalo.min + ' - ' + maxTexto + '</td>' +
+            '<td>' + intervalo.texto + '</td>' +
+            '</tr>';
+    }
+    html += '</table>';
+    document.getElementById("tabela-imc-container").innerHTML = html;
 }
 
 function actionCalcularIMCBuilder() {
