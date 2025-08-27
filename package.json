@@ -1,0 +1,30 @@
+{
+  "name": "basics",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/prof-emilio-resende/basics#readme",
+  "bugs": {
+    "url": "https://github.com/prof-emilio-resende/basics/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prof-emilio-resende/basics.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "src/index.tsx",
+  "scripts": {
+    "build": "vite build",
+    "start": "vite dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/node": "^24.3.0",
+    "node-ts": "^8.0.7",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "vite": "^7.1.3"
+  }
+}

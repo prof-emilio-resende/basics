@@ -1,5 +1,8 @@
 class Pessoa {
-    constructor(altura, peso) {
+    protected altura: number;
+    protected peso: number;
+
+    constructor(altura: number, peso: number) {
         if (!altura || !peso) {
             throw new Error("Altura e peso são obrigatórios");
         }
@@ -9,7 +12,10 @@ class Pessoa {
 }
 
 class Nutricionista extends Pessoa {
-    constructor(altura, peso) {
+    public imcVal: number;
+    public imcLabel: string;
+
+    constructor(altura: number, peso: number) {
         super(altura, peso);
         this.imcVal = 0;
         this.imcLabel = "";
@@ -27,28 +33,22 @@ class Nutricionista extends Pessoa {
             return response.json();
         })
         .then(resp => {
+            console.log(resp);
             this.imcVal = resp.imc;
             this.imcLabel = resp.imcDescription;
             return resp;
         });
     }
-    
-    classificaIMC() {
-        if (this.imcVal < 18.5) return "Abaixo do peso";
-        if (this.imcVal >= 18.5 && this.imcVal < 24.9) return "Peso normal";
-        if (this.imcVal >= 25 && this.imcVal < 29.9) return "Sobrepeso";
-        return "Obesidade";
-    }
 }
 
-function renderizaResultadoIMC(nutricionista) {
+function renderizaResultadoIMC(nutricionista: Nutricionista) {
     nutricionista.imc().then(resp => {
-        document.getElementById("imc").innerText = `${resp.imc.toFixed(2)} - ${resp.imcDescription}`;
+        document.getElementById("imc")!.innerText = `${resp.imc.toFixed(2)} - ${resp.imcDescription}`;
         renderizaTabelaIMC(nutricionista.imcVal);
     });
 }
 
-function renderizaTabelaIMC(valorIMC) {
+function renderizaTabelaIMC(valorIMC: number) {
     const intervalos = [
         { min: 0, max: 18.5, texto: "Abaixo do peso" },
         { min: 18.5, max: 24.9, texto: "Peso normal" },
@@ -63,27 +63,24 @@ function renderizaTabelaIMC(valorIMC) {
         html += `<tr ${destaque}><td>${intervalo.min} - ${maxTexto}</td><td>${intervalo.texto}</td></tr>`;
     }
     html += `</table>`;
-    document.getElementById("tabela-imc-container").innerHTML = html;
+    document.getElementById("tabela-imc-container")!.innerHTML = html;
 }
 
-function actionCalcularIMCBuilder() {
-    const alturaEl = document.getElementById("altura");
-    const pesoEl = document.getElementById("peso");
+export function actionCalcularIMCBuilder(evt: SubmitEvent) {
+    console.log("actionCalcularIMC");
+    evt.preventDefault();
+    const form = evt.currentTarget as HTMLFormElement | null;
+    const alturaEl = (form?.querySelector('#altura') ?? document.getElementById('altura')) as HTMLInputElement | null;
+    const pesoEl = (form?.querySelector('#peso') ?? document.getElementById('peso')) as HTMLInputElement | null;
 
-    return function actionCalcularIMC(evt) {
-        evt.preventDefault();
-        const nutricionista = new Nutricionista(
-            parseFloat(alturaEl.value),
-            parseFloat(pesoEl.value)
-        );
-        console.log(Nutricionista.prototype.constructor);
-        console.log(nutricionista instanceof Pessoa);
-        renderizaResultadoIMC(nutricionista);
+    const altura = parseFloat(alturaEl?.value ?? '');
+    const peso = parseFloat(pesoEl?.value ?? '');
+
+    if (Number.isNaN(altura) || Number.isNaN(peso)) {
+        console.error('Valores inválidos para altura ou peso');
+        return;
     }
-}
 
-window.onload = function () {
-    document
-        .getElementById("calcular")
-        .addEventListener("click", actionCalcularIMCBuilder());
-};
+    const nutricionista = new Nutricionista(altura, peso);
+    renderizaResultadoIMC(nutricionista);
+}

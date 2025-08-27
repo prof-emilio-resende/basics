@@ -1,0 +1,50 @@
+# Node dependencies
+node_modules/
+
+# Vite build output
+/dist/
+.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Coverage
+coverage/
+
+# Caches
+.cache/
+.tmp/
+.eslintcache
+stylelintcache
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Editor & IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.local
+*.log
+
+# Lockfiles (keep the one your project uses; ignore others to avoid accidental commits)
+# Uncomment to ignore alternative lockfiles if you standardize on one
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
