@@ -23,6 +23,25 @@
     min-height: 50%;
   }
 }
+
+#tabela-imc {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  border: 1px solid #000000
+}
+
+#tabela-imc th, #tabela-imc td {
+  border: 1px solid #000000;
+  padding: 8px;
+  text-align: center;
+}
+
+.destaque-imc {
+  background-color: #ff0000;
+  font-weight: bold;
+}
+
 .data {
   display: inline-block;
   text-align: left;
