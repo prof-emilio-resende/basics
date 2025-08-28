@@ -13,12 +13,29 @@ function Nutricionista(altura, peso) {
         return this.peso / (this.altura * this.altura);
     };
 
-    this.classificaIMC = function () {
+    this.getImcFromAPI = async function () {
+        const response = await fetch(`http://localhost:3000/imc/calculate`, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                height: this.altura,
+                weight: this.peso
+            })
+        });
+        const data = await response.json();
+        return parseFloat(data.imc);
+    };
+
+    this.classificaIMC = async function () {
         document.querySelectorAll("tbody tr").forEach(function (tr) {
             tr.classList.remove("result");
         });
 
-        var imc = this.imc();
+        var imc = await this.getImcFromAPI();
+        console.log("==>", imc);
         if (imc < 18.5) {
             document.querySelector(".level1").classList.add("result");
         }
@@ -36,9 +53,9 @@ function Nutricionista(altura, peso) {
         }
     };
 }
+
 Nutricionista.prototype = Object.create(Pessoa.prototype);
 Nutricionista.prototype.constructor = Nutricionista;
-
 
 function actionCalcularIMCBuilder() {
     var alturaEl = document.getElementById("altura");
