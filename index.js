@@ -9,39 +9,40 @@ function Pessoa(altura, peso) {
 
 function Nutricionista(altura, peso) {
     Pessoa.call(this, altura, peso);
-    this.imc = function () {
-        return this.peso / (this.altura * this.altura);
-    };
+    this.valorImc = 0;
+    this.descricaoImc = "";
 
-    this.classificaIMC = function () {
-        var imc = this.imc();
-        if (imc < 18.5) {
-            return "Abaixo do peso";
-        }
-        if (imc >= 18.5 && imc < 24.9) {
-            return "Peso normal";
-        }
-        if (imc >= 25 && imc < 29.9) {
-            return "Sobrepeso";
-        }
-
-        return "Obesidade";
+    this.imc = async function () {
+        var self = this;
+        return calculaImc(this)
+            .then(function (imc) {
+                console.log('----- Nutricionista->imc -----');
+                console.log(imc);
+                console.log(this);
+                console.log(self);
+                self.valorImc = imc.imc;
+                self.descricaoImc = imc.imcDescription;
+            });
     };
 }
 Nutricionista.prototype = Object.create(Pessoa.prototype);
 Nutricionista.prototype.constructor = Nutricionista;
 
 function calculaImc(nutricionista) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:3000/imc/calculate", true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            var response = xhr.responseText;
-            alert(response);
-        }
-    };
-    xhr.send(JSON.stringify({ height: nutricionista.altura, weight: nutricionista.peso }));
+    return fetch("http://localhost:3000/imc/calculate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ height: nutricionista.altura, weight: nutricionista.peso })
+    })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error("Erro ao calcular IMC");
+            }
+        });
 }
 
 function renderizaTabelaIMC(imc) {
@@ -64,9 +65,12 @@ function renderizaTabelaIMC(imc) {
 }
 
 function renderizaResultadoIMC(nutricionista) {
-    document.getElementById("imc").innerText =
-        nutricionista.imc().toFixed(2) + " - " + nutricionista.classificaIMC();
-    renderizaTabelaIMC(nutricionista.imc());
+    nutricionista.imc()
+        .then(function() {
+            document.getElementById("imc").innerText =
+                nutricionista.valorImc + " - " + nutricionista.descricaoImc;
+            renderizaTabelaIMC(parseFloat(nutricionista.valorImc));
+        });
 }
 
 function actionCalcularIMCBuilder() {
@@ -84,7 +88,6 @@ function actionCalcularIMCBuilder() {
         console.log(nutricionista instanceof Pessoa);
 
         renderizaResultadoIMC(nutricionista);
-        calculaImc(nutricionista);
     }
 }
 
