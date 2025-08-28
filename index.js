@@ -1,32 +1,32 @@
-function Pessoa(altura, peso) {
-    if (!altura || !peso) {
-        throw new Error("Altura e peso são obrigatórios");
-    }
+class Pessoa {
+    constructor(altura, peso) {
+        if (!altura || !peso) {
+            throw new Error("Altura e peso são obrigatórios");
+        }
 
-    this.altura = altura;
-    this.peso = peso;
+        this.altura = altura;
+        this.peso = peso;
+    }
 }
 
-function Nutricionista(altura, peso) {
-    Pessoa.call(this, altura, peso);
-    this.valorImc = 0;
-    this.descricaoImc = "";
+class Nutricionista extends Pessoa {
+    constructor(altura, peso) {
+        super(altura, peso);
+        this.valorImc = 0;
+        this.descricaoImc = "";
+    }
 
-    this.imc = async function () {
-        var self = this;
+    imc = async function () {
         return calculaImc(this)
-            .then(function (imc) {
-                console.log('----- Nutricionista->imc -----');
+            .then((imc) => {
+                console.log('----- Nutricionista->imc=> -----');
                 console.log(imc);
                 console.log(this);
-                console.log(self);
-                self.valorImc = imc.imc;
-                self.descricaoImc = imc.imcDescription;
+                this.valorImc = imc.imc;
+                this.descricaoImc = imc.imcDescription;
             });
     };
 }
-Nutricionista.prototype = Object.create(Pessoa.prototype);
-Nutricionista.prototype.constructor = Nutricionista;
 
 function calculaImc(nutricionista) {
     return fetch("http://localhost:3000/imc/calculate", {
@@ -36,7 +36,7 @@ function calculaImc(nutricionista) {
         },
         body: JSON.stringify({ height: nutricionista.altura, weight: nutricionista.peso })
     })
-        .then(function (response) {
+        .then((response) => {
             if (response.ok) {
                 return response.json();
             } else {
@@ -46,19 +46,17 @@ function calculaImc(nutricionista) {
 }
 
 function renderizaTabelaIMC(imc) {
-   var intervalos = [
+   const intervalos = [
        { min: 0, max: 18.4, classificacao: "Abaixo do peso" },
        { min: 18.4, max: 24.9, classificacao: "Peso normal" },
        { min: 24.9, max: 29.9, classificacao: "Sobrepeso" },
        { min: 29.9, max: Infinity, classificacao: "Obesidade" }
    ];
 
-   var html = "<table id='tabela-imc'><thead><tr><th>Classifica&ccedil;&atilde;o</th><th>IMC</th></tr></thead><tbody>";
-   intervalos.forEach(function(x) {
-       var row = "<tr class='destaque-imc-placeholder'><td>{{classificacao}}</td><td>{{intervalo}}</td></tr>"
-       var intervalo = x.min + " - " + x.max;
-       if (imc >= x.min && imc < x.max) row = row.replace("destaque-imc-placeholder", "destaque-imc");
-       html += row.replace("{{intervalo}}", intervalo).replace("{{classificacao}}", x.classificacao);
+   let html = "<table id='tabela-imc'><thead><tr><th>Classifica&ccedil;&atilde;o</th><th>IMC</th></tr></thead><tbody>";
+   intervalos.forEach((x) => {
+       const intervalo = x.min + " - " + x.max;
+       html += `<tr class='${(imc >= x.min && imc < x.max) ? "destaque-imc" : ""}'><td>${x.classificacao}</td><td>${intervalo}</td></tr>`
    });
    html += "</tbody></table>";
    document.getElementById("tabela-imc-container").innerHTML = html;
@@ -66,7 +64,7 @@ function renderizaTabelaIMC(imc) {
 
 function renderizaResultadoIMC(nutricionista) {
     nutricionista.imc()
-        .then(function() {
+        .then(() => {
             document.getElementById("imc").innerText =
                 nutricionista.valorImc + " - " + nutricionista.descricaoImc;
             renderizaTabelaIMC(parseFloat(nutricionista.valorImc));
@@ -80,13 +78,10 @@ function actionCalcularIMCBuilder() {
     return function actionCalcularIMC(evt) {
         evt.preventDefault();
 
-        var nutricionista = new Nutricionista(
+        const nutricionista = new Nutricionista(
             parseFloat(alturaEl.value),
             parseFloat(pesoEl.value)
         );
-        console.log(Nutricionista.prototype.constructor);
-        console.log(nutricionista instanceof Pessoa);
-
         renderizaResultadoIMC(nutricionista);
     }
 }
